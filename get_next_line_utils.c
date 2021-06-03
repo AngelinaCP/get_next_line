@@ -73,48 +73,5 @@ char	*ft_strdup(const char *s1)
 	return (d);
 }
 
-int get_next_line(int fd, char **line)
-{
-	char 	buf[BUFF + 1];
-	int			count;
-	char 		*ptr;
-	int 		i;
-	static char	*start_l;
-
-	i = 0;
-	printf("\n|%s|", start_l);
-	if (start_l)
-		*line = ft_strdup(start_l);
-	else
-		if (!(*line = ((char *)malloc(1000 * sizeof(char)))))
-			return (-1);
-	while (!i && (count = read(fd, buf, 15)))
-	{
-		buf[count] = '\0';
-		if ((ptr = ft_strchr(buf, '\n')))
-		{
-			*ptr = '\0';
-			i = 1;
-		}
-		*line = ft_strjoin(*line, buf);
-	}
-	start_l = ft_strdup(++ptr);
-	return (0);
-}
-
-int main(void)
-{
-	char	*line;
-	int		fd;
-
-	fd = open("file.txt", O_RDONLY);
-	get_next_line(fd, &line);
-	printf("%s", line);
-
-	get_next_line(fd, &line);
-	printf("\n\n%s", line);
 
 
-
-
-}
