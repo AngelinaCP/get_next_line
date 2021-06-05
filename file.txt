@@ -1,2 +1,2 @@
-Initialized data segment, usually called simply the Data Segment. A data segment is a portion of the virtual address space of a program, which contains the global variables and static variables that are initialized by the programmer.
-4554
+9876543210987654321098765432109876543210
+0
