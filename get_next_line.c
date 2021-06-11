@@ -1,83 +1,78 @@
 #include "get_next_line.h"
 
-char *next_line(char *start_l, char **line)
+char *next_line(char **start_l, char **line)
 {
 	char		*ptr2;
 
 	ptr2 = NULL;
-	if (start_l)
+	if (*start_l)
 	{
-		if ((ptr2 = ft_strchr(start_l, '\n')))
+		ptr2 = ft_strchr(*start_l, '\n');
+		if (ptr2)
 		{
 			*ptr2 = '\0';
-			*line = ft_strdup(start_l);
 			ptr2++;
-			ft_strcpy(start_l, ptr2);
+			*line = ft_strdup(*start_l);
+			ft_strcpy(*start_l, ptr2);
 		}
 		else
 		{
-			*line = ft_strdup(start_l);
-			free(start_l);
+			*line = ft_strdup(*start_l);
+			free(*start_l);
 			start_l = NULL;
 		}
 	}
 	else
-	{
-		*line = ((char *)malloc((BUFFER + 1) * sizeof(char)));
-	}
+		*line = ((char *)malloc((BUFFER_SIZE + 1) * sizeof(char)));
 	return (ptr2);
 }
 
 int get_next_line(int fd, char **line)
 {
-	char 		buf[BUFFER + 1];
+	char 		*buf;
 	int			count;
-	char 		*ptr;
-	int 		i;
 	static char	*start_l;
 	char		*copy;
 	char 		*p;
 
-	i = 0;
-	if (fd < 0 || line == NULL || read(fd, 0, 0))
+	if (fd < 0 || BUFFER_SIZE < 1 || !line || read(fd, 0, 0) < 0)
 		return (-1);
-	p = next_line(start_l, line);
-	while (!p && (count = read(fd, buf, BUFFER)) > 0)
+	buf = (char *)malloc(sizeof(*buf) * (BUFFER_SIZE + 1));
+	p = next_line(&start_l, line);
+	count = 1;
+	while (!p && count != 0)
 	{
+		count = read(fd, buf, BUFFER_SIZE);
+		if (count == -1)
+			return (-1);
 		buf[count] = '\0';
-		if ((ptr = ft_strchr(buf, '\n')))
+		p = ft_strchr(buf, '\n');
+		if (p)
 		{
-			*ptr = '\0';
-			i = 1;
-			start_l = ft_strdup(++ptr);
+			*p = '\0';
+			start_l = ft_strdup(++p);
 		}
 		copy = *line;
 		*line = ft_strjoin(*line, buf);
-		free (copy);
+		free(copy);
+		copy = NULL;
 	}
-	printf("|%s|", start_l);
-	if (start_l)
-		return (1);
-	return (0);
+	free(buf);
+	if (count == 0)
+	{
+		start_l = NULL;
+		return (0);
+	}
+	return (1);
 }
 
-int main(int argc, char **argv)
-{
-	char	*line;
-	int		fd;
-	int i;
-	fd = open("file.txt", O_RDONLY);
-	while (get_next_line(fd, &line))
-	{
-		printf("%s\n", line);
-		free (line);
-	}
+//int main(void)
+// {
+//	char *line;
+//	int fd;
+//	fd = open("/Users/ddelena/Documents/gnl/file.txt", O_RDONLY);
 //	get_next_line(fd, &line);
 //	printf("%s\n", line);
 //	get_next_line(fd, &line);
 //	printf("%s\n", line);
-//	get_next_line(fd, &line);
-//	printf("%s\n", line);
-//	get_next_line(fd, &line);
-//	printf("%s\n", line);
-}
+//}
