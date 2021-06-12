@@ -1,4 +1,4 @@
-#include "get_next_line.h"
+#include "get_next_line_bonus.h"
 
 char	*next_line(char **start_l, char **line)
 {
@@ -48,13 +48,13 @@ int	get_next_line(int fd, char **line)
 {
 	char		*buf;
 	int			count;
-	static char	*start_l;
+	static char	*start_l[1000];
 	char		*p;
 
 	if (fd < 0 || BUFFER_SIZE < 1 || !line || read(fd, 0, 0) < 0)
 		return (-1);
 	buf = (char *)malloc(sizeof(*buf) * (BUFFER_SIZE + 1));
-	p = next_line(&start_l, line);
+	p = next_line(&start_l[fd], line);
 	count = 1;
 	while (!p && count != 0)
 	{
@@ -62,12 +62,12 @@ int	get_next_line(int fd, char **line)
 		if (count == -1)
 			return (-1);
 		buf[count] = '\0';
-		find_n(&p, &start_l, line, buf);
+		find_n(&p, &start_l[fd], line, buf);
 	}
 	free(buf);
 	if (count == 0)
 	{
-		start_l = NULL;
+		start_l[fd] = NULL;
 		return (0);
 	}
 	return (1);
